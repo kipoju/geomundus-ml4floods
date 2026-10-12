@@ -1,0 +1,22 @@
+# Local installation (CPU is enough):
+#     conda env create -f environment.yml
+#     conda activate geomundus-floods
+#     pip install --no-deps ml4floods==1.1.1
+name: geomundus-floods
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pytorch
+  - torchvision
+  - rasterio
+  - geopandas
+  - scikit-image>=0.26
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - jupyterlab
+  - ipywidgets
+  - pip
+  - pip:
+      - -r requirements.txt

@@ -1,0 +1,17 @@
+# Packages installed on top of an environment that already has PyTorch (Google Colab does).
+# ml4floods itself is installed afterwards WITHOUT its dependencies:
+#     pip install -r requirements.txt
+#     pip install --no-deps ml4floods==1.1.1
+# (its full dependency list pulls Earth Engine, Google Cloud Storage... that this course does not need)
+georeader-spaceml==2.3.5
+pytorch-lightning==2.6.6
+albumentations==2.0.8
+rasterio==1.5.1
+geopandas>=1.0
+mercantile==1.2.1
+matplotlib-scalebar==0.9.0
+seaborn
+scikit-image>=0.26
+scikit-learn
+huggingface_hub
+ipywidgets
