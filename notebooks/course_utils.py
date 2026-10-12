@@ -20,7 +20,7 @@ from skimage.feature import canny
 from skimage.filters import threshold_otsu
 from skimage.morphology import dilation, footprint_rectangle, remove_small_objects
 from skimage.util import view_as_blocks
-from sklearn.metrics import accuracy_score, jaccard_score, precision_score, recall_score
+from sklearn.metrics import confusion_matrix
 
 IN_COLAB = "google.colab" in sys.modules
 ROOT = Path(os.environ.get("COURSE_ROOT", Path(__file__).resolve().parents[1]))
@@ -145,11 +145,11 @@ def confusion_legend(ax=None, **kwargs):
 def binary_metrics(pred: np.ndarray, ref: np.ndarray, valid: np.ndarray) -> dict:
     """Precision / recall / IoU / overall accuracy of the water class on valid pixels (sklearn.metrics)."""
     valid = np.asarray(valid)
-    y_true, y_pred = np.asarray(ref)[valid], np.asarray(pred)[valid]
-    return {"precision": precision_score(y_true, y_pred, zero_division=0),
-            "recall": recall_score(y_true, y_pred, zero_division=0),
-            "IoU": jaccard_score(y_true, y_pred, zero_division=0),
-            "OA": accuracy_score(y_true, y_pred)}
+    tn, fp, fn, tp = confusion_matrix(np.asarray(ref)[valid], np.asarray(pred)[valid], labels=[False, True]).ravel()
+    return {"precision": tp / (tp + fp) if tp + fp else 0.,
+            "recall": tp / (tp + fn) if tp + fn else 0.,
+            "IoU": tp / (tp + fp + fn) if tp + fp + fn else 0.,
+            "OA": (tp + tn) / (tp + tn + fp + fn)}
 
 
 # ----------------------------------------------------------------------------------------------
