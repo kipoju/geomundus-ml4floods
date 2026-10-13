@@ -12,9 +12,11 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_URLS = [  # tried in order
-    "https://github.com/kipoju/geomundus-ml4floods/releases/download/data-v1/geomundus_data.zip",
-]
+RELEASE = "https://github.com/kipoju/geomundus-ml4floods/releases/download/data-v1"
+DATA = {  # zip in the release -> a file it contains (if that file exists, the zip is not downloaded again)
+    "geomundus_data.zip": "data/worldfloods_subset/traintestval.json",
+    "geomundus_data_extra.zip": "data/extra/EMSR264_18MIANDRIVAZODETAIL_S2_2018-01-09.tif",
+}
 ML4FLOODS = "ml4floods==1.1.1"
 
 
@@ -34,22 +36,19 @@ def install() -> None:
 
 def download_data() -> None:
     """Course data (data/) and models (models/), unzipped next to the notebooks."""
-    if (ROOT / "data" / "worldfloods_subset" / "traintestval.json").exists():
-        return
-    zip_file = ROOT / "geomundus_data.zip"
-    for url in DATA_URLS:
+    for name, marker in DATA.items():
+        if (ROOT / marker).exists():
+            continue
+        zip_file = ROOT / name
+        print(f"Downloading {name} ...")
         try:
-            print(f"Downloading course data from {url} ...")
-            urllib.request.urlretrieve(url, zip_file)
-            break
-        except Exception as e:  # noqa: BLE001  (try the next mirror)
-            print(f"  failed: {e}")
-    else:
-        raise RuntimeError("Could not download the course data. Ask the instructor for the zip and upload it "
-                           f"to {ROOT}.")
-    with zipfile.ZipFile(zip_file) as z:
-        z.extractall(ROOT)
-    zip_file.unlink()
+            urllib.request.urlretrieve(f"{RELEASE}/{name}", zip_file)
+        except Exception as e:
+            raise RuntimeError(f"Could not download {RELEASE}/{name} ({e}). Ask the instructor for the zip and "
+                               f"unzip it in {ROOT}.") from e
+        with zipfile.ZipFile(zip_file) as z:
+            z.extractall(ROOT)
+        zip_file.unlink()
 
 
 def setup() -> None:
