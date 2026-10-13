@@ -19,7 +19,6 @@ from ml4floods.data.worldfloods.configs import BANDS_S2
 from skimage.feature import canny
 from skimage.filters import threshold_otsu
 from skimage.morphology import dilation, footprint_rectangle, remove_small_objects
-from skimage.util import view_as_blocks
 from sklearn.metrics import confusion_matrix
 
 IN_COLAB = "google.colab" in sys.modules
@@ -93,53 +92,37 @@ def band(s2: np.ndarray, name: str) -> np.ndarray:
     return s2[BANDS_S2.index(name)]
 
 
-def composite(s2: np.ndarray, bands=("B4", "B3", "B2"), max_val: float = 3000.) -> np.ndarray:
-    """(H, W, 3) image in [0, 1] for plt.imshow. Use bands=("B11", "B8", "B4") for SWIR-NIR-Red."""
-    return np.clip(np.stack([np.asarray(band(s2, b)) for b in bands], axis=-1) / max_val, 0, 1)
-
-
 def mndwi(s2: np.ndarray) -> np.ndarray:
-    """MNDWI = (Green - SWIR1) / (Green + SWIR1)."""
+    """MNDWI = (Green - SWIR1) / (Green + SWIR1) (as in notebook 01a)."""
     g, swir = band(s2, "B3"), band(s2, "B11")
     return (g - swir) / (g + swir + 1e-6)
 
 
-def awei_sh(s2: np.ndarray) -> np.ndarray:
-    """AWEI_sh (Feyisa et al., 2014) = Blue + 2.5 Green - 1.5 (NIR + SWIR1) - 0.25 SWIR2 (reflectance)."""
-    b, g, nir, sw1, sw2 = (band(s2, x) / 10_000 for x in ("B2", "B3", "B8", "B11", "B12"))
-    return b + 2.5 * g - 1.5 * (nir + sw1) - 0.25 * sw2
+# ----------------------------------------------------------------------------------------------
+# Classes and colours for georeader.plot.plot_segmentation_mask(mask, colors, interpretation_array)
+# ----------------------------------------------------------------------------------------------
+GT_CLASSES = ["invalid", "land", "water", "cloud"]
+COLORS_GT = np.array([[0, 0, 0], [139, 64, 0], [0, 0, 240], [220, 220, 220]]) / 255
+PRED_CLASSES = GT_CLASSES + ["flood trace"]    # output of ml4floods with distinguish_flood_traces=True
+COLORS_PRED = np.vstack([COLORS_GT, [230 / 255, 160 / 255, 40 / 255]])
+
+CONFUSION_CLASSES = ["TN (land)", "TP (water)", "FN (missed water)", "FP (false alarm)", "invalid / cloud"]
+COLORS_CONFUSION = np.array([[0.78, 0.78, 0.78], [0.0, 0.13, 0.42], [0.10, 0.65, 0.20], [0.85, 0.10, 0.10],
+                             [1.0, 1.0, 1.0]])
 
 
-def ndwi(s2: np.ndarray) -> np.ndarray:
-    """NDWI (McFeeters) = (Green - NIR) / (Green + NIR)."""
-    g, nir = band(s2, "B3"), band(s2, "B8")
-    return (g - nir) / (g + nir + 1e-6)
+def gt_classes(gt: np.ndarray) -> np.ndarray:
+    """(2, y, x) WorldFloods v2 ground truth → one layer {0: invalid, 1: land, 2: water, 3: cloud}."""
+    classes = gt[1].copy()          # layer 1: {0: invalid, 1: land, 2: water}
+    classes[gt[0] == 2] = 3         # layer 0: {0: invalid, 1: clear, 2: cloud}
+    return classes
 
 
-CONFUSION_COLORS = {"TN (land)": (0.78, 0.78, 0.78), "TP (water)": (0.0, 0.13, 0.42),
-                    "FN (missed water)": (0.10, 0.65, 0.20), "FP (false alarm)": (0.85, 0.10, 0.10),
-                    "invalid / cloud": (1.0, 1.0, 1.0)}
-
-
-def confusion_overlay(pred: np.ndarray, ref: np.ndarray, valid: np.ndarray) -> np.ndarray:
-    """RGB image: TN grey, TP navy, FN green, FP red, invalid white (legend: `confusion_legend`)."""
-    pred, ref, valid = np.asarray(pred), np.asarray(ref), np.asarray(valid)
-    c = list(CONFUSION_COLORS.values())
-    out = np.empty(pred.shape + (3,), dtype=np.float32)
-    out[...] = c[0]
-    out[pred & ref] = c[1]
-    out[~pred & ref] = c[2]
-    out[pred & ~ref] = c[3]
-    out[~valid] = c[4]
-    return out
-
-
-def confusion_legend(ax=None, **kwargs):
-    """Legend with the colours of `confusion_overlay`."""
-    from matplotlib.patches import Patch
-    ax = ax or plt.gca()
-    handles = [Patch(facecolor=col, edgecolor="k", lw=0.5, label=k) for k, col in CONFUSION_COLORS.items()]
-    return ax.legend(handles=handles, **{"loc": "lower left", "fontsize": 8, "framealpha": 0.9, **kwargs})
+def confusion_classes(pred: np.ndarray, ref: np.ndarray, valid: np.ndarray) -> np.ndarray:
+    """Errors of a water map {0: TN, 1: TP, 2: FN, 3: FP, 4: invalid} (classes of CONFUSION_CLASSES)."""
+    classes = (pred & ref) * 1 + (~pred & ref) * 2 + (pred & ~ref) * 3
+    classes[~valid] = 4
+    return classes
 
 
 def binary_metrics(pred: np.ndarray, ref: np.ndarray, valid: np.ndarray) -> dict:
@@ -194,49 +177,16 @@ def find_event(event: str = EVENT) -> tuple[Path, str]:
 
 
 # ----------------------------------------------------------------------------------------------
-# SAR thresholding: Edge Otsu, BMax Otsu (plain Otsu = skimage.filters.threshold_otsu)
-# Edge Otsu and BMax Otsu follow the reference implementation of Markert et al. (2020),
-# https://doi.org/10.3390/rs12152469 (hydrafloods `thresholding.py`), ported from Earth Engine to numpy.
+# Edge Otsu: same code as in notebook 01b (used again in 02a to compare with deep learning)
 # ----------------------------------------------------------------------------------------------
-def bmax(values: np.ndarray, t0: float) -> float:
-    """Normalised between-class variance with the split at t0: p1·p2·(m1-m2)² / σ²  (0..1).
-    High (> ~0.75) = the two classes are well separated = bimodal histogram."""
-    values = np.asarray(values).ravel()
-    w = values < t0
-    p1 = w.mean()
-    if p1 == 0 or p1 == 1:
-        return 0.
-    return float(p1 * (1 - p1) * (values[w].mean() - values[~w].mean()) ** 2 / values.var())
-
-
 def edge_otsu(img: np.ndarray, t0: float = -16., canny_sigma: float = 1., edge_length: int = 50,
               buffer_px: int = 10) -> tuple[float, np.ndarray]:
-    """Edge Otsu: Otsu only on pixels close to water/land edges.
-    1. initial water mask img < t0;  2. Canny edges of that mask;  3. drop edges shorter than
-    `edge_length` px;  4. buffer the edges `buffer_px` px per side (100 m at 10 m);  5. Otsu there.
-    Returns (threshold, buffered-edges mask)."""
+    """Otsu only on the pixels near the edges of a rough water mask (img < t0). Returns (threshold, mask)."""
     img = np.asarray(img)
     edges = canny((img < t0).astype(np.float32), sigma=canny_sigma)
-    # keep the edges with >= edge_length connected pixels (max_size = largest size that is removed)
     edges = remove_small_objects(edges, max_size=edge_length - 1, connectivity=2)
     buffered = dilation(edges, footprint_rectangle((2 * buffer_px + 1, 2 * buffer_px + 1)))
     return float(threshold_otsu(img[buffered])), buffered
-
-
-def bmax_otsu(img: np.ndarray, t0: float = -16., tile: int = 128, bmax_threshold: float = 0.75
-              ) -> tuple[float, np.ndarray, np.ndarray]:
-    """BMax Otsu: split the image in tiles, keep the tiles whose histogram is bimodal
-    (BMax > bmax_threshold) and run Otsu on the pixels of those tiles.
-    Returns (threshold, per-tile BMax array, selected-pixels mask)."""
-    img = np.asarray(img)
-    nr, nc = img.shape[0] // tile, img.shape[1] // tile
-    tiles = view_as_blocks(img[:nr * tile, :nc * tile], (tile, tile))   # (nr, nc, tile, tile); border dropped
-    bm = np.array([[bmax(t, t0) for t in row] for row in tiles])
-    if not (bm > bmax_threshold).any():
-        raise ValueError(f"no tile with BMax > {bmax_threshold}: try smaller tiles or another t0")
-    selected = np.zeros(img.shape, dtype=bool)
-    selected[:nr * tile, :nc * tile] = np.kron(bm > bmax_threshold, np.ones((tile, tile), dtype=bool))  # tile -> px
-    return float(threshold_otsu(img[selected])), bm, selected
 
 
 def hist_by_class(values: np.ndarray, water: np.ndarray, land: np.ndarray, t: float | None = None,

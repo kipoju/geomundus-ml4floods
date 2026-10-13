@@ -12,10 +12,9 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-RELEASE = "https://github.com/kipoju/geomundus-ml4floods/releases/download/data-v1"
+RELEASE = "https://github.com/kipoju/geomundus-ml4floods/releases/download/data-v2"
 DATA = {  # zip in the release -> a file it contains (if that file exists, the zip is not downloaded again)
-    "geomundus_data.zip": "data/worldfloods_subset/traintestval.json",
-    "geomundus_data_extra.zip": "data/extra/EMSR264_18MIANDRIVAZODETAIL_S2_2018-01-09.tif",
+    "geomundus_data.zip": "data/worldfloods_subset/train/floodmaps/EMSR429_AOI09_DEL_MONIT01.geojson",
 }
 ML4FLOODS = "ml4floods==1.1.1"
 
