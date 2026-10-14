@@ -14,7 +14,8 @@ and run inference.
 |---|---|---|
 | `01a_optical` | Hands-on 1 · Sentinel-2: spectral signatures, water indices and thresholds | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kipoju/geomundus-ml4floods/blob/main/notebooks/01a_optical.ipynb) |
 | `01b_sar` | Hands-on 1 · Sentinel-1: backscatter, Otsu thresholding and HAND | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kipoju/geomundus-ml4floods/blob/main/notebooks/01b_sar.ipynb) |
-| `02a_training` | Hands-on 2 · Train your own flood segmentation model with ml4floods | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kipoju/geomundus-ml4floods/blob/main/notebooks/02a_training.ipynb) |
+| `02a_training` | Hands-on 2 · Train a flood segmentation model with ml4floods on the floods we labelled together | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kipoju/geomundus-ml4floods/blob/main/notebooks/02a_training.ipynb) |
+| `02a_training_backup` | Hands-on 2 · (backup) The same training on flood maps prepared before the workshop | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kipoju/geomundus-ml4floods/blob/main/notebooks/02a_training_backup.ipynb) |
 | `02b_inference` | Hands-on 2 · Map new floods with the WorldFloods pretrained model, export to GIS | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kipoju/geomundus-ml4floods/blob/main/notebooks/02b_inference.ipynb) |
 
 ## Running the notebooks
@@ -39,7 +40,7 @@ On macOS with Apple Silicon, set `accelerator="cpu"` when training.
 ## Contents
 
 ```
-notebooks/      the four notebooks + course_utils.py (helper functions) + colab_setup.py
+notebooks/      the notebooks + course_utils.py (helper functions) + colab_setup.py
 data/           WorldFloods v2 events (Sentinel-2, reference flood maps, permanent water), plus Sentinel-1 and HAND
                 for some of them, organised as an ml4floods dataset (train / val / test)
 models/         WF2_unetv2_bgriswirs (pretrained on WorldFloods v2) and course_unet (trained on the course data)
