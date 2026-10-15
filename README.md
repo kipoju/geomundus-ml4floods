@@ -8,6 +8,9 @@ This tutorial explores **WorldFloods**, a dataset for flood mapping and cloud ma
 **ml4floods**, a Python package to process floods into ML-ready data, train deep learning models, evaluate them
 and run inference.
 
+**Slides:** [kipoju.github.io/geomundus-ml4floods](https://kipoju.github.io/geomundus-ml4floods/) (web) ·
+[PDF](slides/geomundus2026_flood_mapping_slides.pdf)
+
 ## Notebooks
 
 | Notebook | Content | Colab |
@@ -44,7 +47,7 @@ notebooks/      the notebooks + course_utils.py (helper functions) + colab_setup
 data/           WorldFloods v2 events (Sentinel-2, reference flood maps, permanent water), plus Sentinel-1 and HAND
                 for some of them, organised as an ml4floods dataset (train / val / test)
 models/         WF2_unetv2_bgriswirs (pretrained on WorldFloods v2) and course_unet (trained on the course data)
-slides/         workshop slides (PDF)
+slides/         workshop slides (PDF; web version at kipoju.github.io/geomundus-ml4floods)
 ```
 
 ## Data and credits
