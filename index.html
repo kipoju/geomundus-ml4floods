@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flood Mapping from Satellite Imagery with ML4Floods — GeoMundus 2026 - Slidev</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" type="text/css">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/isp/luis.webp">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/isp/gonzalo.webp">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/isp/cesar.webp">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/isp/simon.webp">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/isp/julio.webp">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/isp/kike.webp">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/ext_thesis_people_affected.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/ext_arset_global_floods.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/diag_valencia_cycle.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/diag_flood_cycle.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/qr_course_repo.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/rs_spectrum.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/rs_resolution.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/opt_composites.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/opt_spectral_profiles.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/opt_indices.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/opt_index_threshold.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/opt_limits.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_clouds.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/ext_sar_geometry.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/diag_sar_aperture.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_db.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_speckle_physics.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_speckle.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_roughness.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/diag_sar_mechanisms.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_distortions.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_bright_water.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_vv_vh.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_flood_hist.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_threshold.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_otsu_curve.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_otsu_box_vs_full.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_edge_otsu.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_bmax_otsu.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_methods_compare.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/sar_hand.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/ext_arset_threshold_limits.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_rules_break.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_ml_vs_dl.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_neuron_generic.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/diag_mlp.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_learning_curve.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_cnn_unet.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/qr_27d2587b.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_datasets.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_wf_map.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_wf_s2.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_wf_gt.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/qr_12ba7e1c.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_cems_to_gt.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_tiling.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_split_map.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_metrics_gt.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_metrics_pred.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_pr_curves.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_probabilities.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_threshold.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/diag_ml4floods_modules.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_lismore_freq.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_lismore_obs.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_lismore_post.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_pakistan_grid.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/ext_book_backscatter.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/ext_arset_polarization.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/ext_sarhb_roughness.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/ext_arset_flooded_vegetation.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/ext_sarhb_flooded_forest.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/ext_sarhb_penetration.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_vs_classical.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_ours_failure.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_multioutput.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_wf2_new_floods.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/dl_polygons.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_tecmar.png">
+<link rel="preload" as="image" href="/geomundus-ml4floods/figs/thesis_fdl.png">
+<link rel="icon" href="https://cdn.jsdelivr.net/gh/slidevjs/slidev/assets/favicon.png">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta property="slidev:version" content="53.0.0">
+<meta name="description" content="&quot;GeoMundus 2026 workshop — flood mapping with WorldFloods and ml4floods (Enrique Portalés Julià, Universitat de València)&quot;">
+<meta property="og:title" content="Flood Mapping from Satellite Imagery with ML4Floods — GeoMundus 2026 - Slidev">
+<meta property="og:description" content="&quot;GeoMundus 2026 workshop — flood mapping with WorldFloods and ml4floods (Enrique Portalés Julià, Universitat de València)&quot;">  <script type="module" crossorigin src="/geomundus-ml4floods/assets/index-B6KVVyzr.js"></script>
+  <link rel="modulepreload" crossorigin href="/geomundus-ml4floods/assets/rolldown-runtime-hePW80VL.js">
+  <link rel="modulepreload" crossorigin href="/geomundus-ml4floods/assets/modules/shiki-ChKvKULv.js">
+  <link rel="modulepreload" crossorigin href="/geomundus-ml4floods/assets/utils-CO6qKg7f.js">
+  <link rel="modulepreload" crossorigin href="/geomundus-ml4floods/assets/modules/vue-CJOvzhY3.js">
+  <link rel="modulepreload" crossorigin href="/geomundus-ml4floods/assets/slidev/context-CzXJclJ0.js">
+  <link rel="modulepreload" crossorigin href="/geomundus-ml4floods/assets/useNav-mJg-wedY.js">
+  <link rel="stylesheet" crossorigin href="/geomundus-ml4floods/assets/modules/shiki-V4-KMA-J.css">
+  <link rel="stylesheet" crossorigin href="/geomundus-ml4floods/assets/index-C7EO8f2s.css">
+</head>
+<body>
+  <div id="app"></div>
+  <div id="mermaid-rendering-container"></div>
+  
+</body>
+</html>

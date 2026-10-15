@@ -1,0 +1,46 @@
+{
+  "event": "EMSR271_02FARKADONA_DEL_v1",
+  "factor": 2,
+  "height": 1097,
+  "width": 1337,
+  "ranges": {
+    "mndwi": [
+      -1.0,
+      1.0
+    ],
+    "vv": [
+      -30.0,
+      5.0
+    ],
+    "hand": [
+      0.0,
+      255.0
+    ]
+  },
+  "label": {
+    "0": "invalid/cloud",
+    "1": "land",
+    "2": "water"
+  },
+  "otsu_vv_global_db": -11.15,
+  "reference_metrics_full_res": {
+    "mndwi>0": {
+      "precision": 0.642,
+      "recall": 0.906,
+      "IoU": 0.602,
+      "OA": 0.922
+    },
+    "otsu_vv_global": {
+      "precision": 0.279,
+      "recall": 0.791,
+      "IoU": 0.26,
+      "OA": 0.707
+    },
+    "vv<-15.1&hand<15": {
+      "precision": 0.845,
+      "recall": 0.586,
+      "IoU": 0.53,
+      "OA": 0.932
+    }
+  }
+}
